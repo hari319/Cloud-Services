@@ -1,0 +1,10 @@
+{
+  "instantMongo": {
+    "connections": [
+      {
+        "name": "New Database Connection",
+        "uri": "mongodb://mongodb:27017/mongoDB"
+      }
+    ]
+  }
+}

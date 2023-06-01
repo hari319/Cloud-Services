@@ -1,0 +1,31 @@
+version: "3.1"
+services:
+  db:
+    image: postgres
+    restart: on-failure
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgresUser
+      POSTGRES_PASSWORD: postgresPass
+      POSTGRES_DB: postgresDB
+    volumes: 
+      - db:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      
+  user-service:
+    restart: on-failure
+    build: 
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://postgresUser:postgresPass@db:5432/postgresDB
+    ports:
+      - 3100:3100
+    depends_on:
+      - db
+    command: npm run start
+
+volumes:
+  db:
+    driver: local

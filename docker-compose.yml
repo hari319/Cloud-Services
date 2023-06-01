@@ -1,0 +1,34 @@
+version: "3"
+services:
+  postgresql:
+    image: postgres:14.1-alpine
+    restart: on-failure
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: PostgreSql
+      POSTGRES_DB: postgres
+    volumes: 
+      - ./db:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - cloud-curriculum-network
+
+  app-service:
+    restart: on-failure
+    build: 
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://postgres:PostgreSql@postgresql:5432/postgres
+    ports:
+      - 3002:3002
+    depends_on:
+      - postgresql
+    command: npm run start
+    networks:
+      - cloud-curriculum-network
+
+networks:
+  cloud-curriculum-network:
