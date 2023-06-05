@@ -3,9 +3,9 @@ const bodyParser = require('body-parser');
 const { MongoClient, ObjectId } = require('mongodb');
 
 const app = express();
-const port = 3200;
-const mongoDbName = 'mongo_db';
-const mongoURL = `mongodb://product_db_host:27017/${mongoDbName}`;
+const port = process.env.PRODUCT_SERVICE_PORT;
+const mongoDbName = process.env.MONGO_DB;
+const mongoURL = `mongodb://${process.env.MONGO_HOST}:27017/${mongoDbName}`;
 const client = new MongoClient(mongoURL);
 
 const getProducts = async (request, response) => {

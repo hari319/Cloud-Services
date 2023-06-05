@@ -48,7 +48,13 @@ services:
       context: ./users-service
       dockerfile: Dockerfile
     environment:
-      - POSTGRES_URI=postgresql://postgres_user:postgres_pass@user_db_host:5432/user_db
+      USER_SERVICE_PORT: 3100
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_pass
+      POSTGRES_DB: user_db
+      POSTGRES_PORT: 5432
+      POSTGRES_HOST: user_db_host
+      POSTGRES_URI: postgresql://postgres_user:postgres_pass@user_db_host:5432/user_db
     ports:
       - 3100:3100
     depends_on:
@@ -58,7 +64,6 @@ services:
       - cloud-services
 
 
-
   product_service:
     restart: on-failure
     build: 
@@ -66,6 +71,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - 3200:3200
+    environment:
+      PRODUCT_SERVICE_PORT: 3200
+      MONGO_DB: mongo_db
+      MONGO_HOST: product_db_host
     depends_on:
       - product_db_host
     command: npm run start
@@ -80,7 +89,13 @@ services:
       context: ./orders-service
       dockerfile: Dockerfile
     environment:
-      - POSTGRES_URI=postgresql://postgres_user:postgres_pass@order_db_host:5432/order_db
+      ORDER_SERVICE_PORT: 3300
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_pass
+      POSTGRES_DB: order_db
+      POSTGRES_PORT: 5432
+      POSTGRES_HOST: order_db_host
+      POSTGRES_URI: postgresql://postgres_user:postgres_pass@order_db_host:5432/order_db
     ports:
       - 3300:3300
     depends_on:

@@ -3,14 +3,14 @@ const bodyParser = require('body-parser');
 const Pool = require('pg').Pool;
 
 const app = express();
-const port = 3300;
+const port = process.env.ORDER_SERVICE_PORT;
 
 const pool = new Pool({
-  user: 'postgres_user',
-  password: 'postgres_pass',
-  host: 'order_db_host',
-  database: 'order_db',
-  port: 5432,
+  user: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  host: process.env.POSTGRES_HOST,
+  database: process.env.POSTGRES_DB,
+  port: process.env.POSTGRES_PORT,
 });
 
 const getOrders = (request, response) => {

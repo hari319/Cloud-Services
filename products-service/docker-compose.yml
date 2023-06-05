@@ -14,7 +14,11 @@ services:
       context: ./products-service
       dockerfile: Dockerfile
     ports:
-      - 3200:3200
+      - 3200:3200 
+    environment:
+      PRODUCT_SERVICE_PORT: 3200
+      MONGO_DB: mongo_db
+      MONGO_HOST: product_db_host
     depends_on:
       - product_db_host
     command: npm run start
