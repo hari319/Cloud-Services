@@ -1,18 +1,20 @@
 version: "3.1"
 services:
-  mongodb:
+  product_db_host:
     image: mongo
     restart: on-failure
     ports:
       - 27017:27017
+    networks:
+      - cloud-services
       
-  product-service:
+  product_service:
     restart: on-failure
     build: 
-      context: ./
+      context: ./products-service
       dockerfile: Dockerfile
     ports:
       - 3200:3200
     depends_on:
-      - mongodb
+      - product_db_host
     command: npm run start

@@ -3,38 +3,18 @@ const bodyParser = require('body-parser');
 const Pool = require('pg').Pool;
 
 const app = express();
-const port = 3100;
+const port = 3300;
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'postgresql',
-  database: 'postgres',
-  password: 'PostgreSql',
+  user: 'postgres_user',
+  password: 'postgres_pass',
+  host: 'order_db_host',
+  database: 'order_db',
   port: 5432,
 });
 
-app.use(bodyParser.json());
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-);
-
-app.get('/', (request, response) => {
-  response.json({
-    info: 'Node.js, Express, and Postgres API',
-  });
-});
-app.get('/orders', getOrders);
-app.get('/order/:id', getOrderById);
-app.post('/order', createOrder);
-app.put('/order/:id', updateOrder);
-
-app.listen(port, () => {
-  console.log(`App running on port ${port}.`);
-});
-
 const getOrders = (request, response) => {
+  console.log('12');
   pool.query(
     'SELECT * FROM orders ORDER BY id ASC',
     (error, results) => {
@@ -42,6 +22,8 @@ const getOrders = (request, response) => {
         console.log('zz');
         throw error;
       }
+
+      console.log(results.rows);
 
       response.status(200).json(results.rows);
     }
@@ -139,9 +121,27 @@ const updateOrder = async (request, response) => {
   }
 };
 
+app.use(bodyParser.json());
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
+
+app.get('/', (request, response) => {
+  response.json({
+    info: 'Node.js, Express, and Postgres API',
+  });
+});
+app.get('/orders', getOrders);
+app.get('/order/:id', getOrderById);
+app.post('/order', createOrder);
+app.put('/order/:id', updateOrder);
+
+app.listen(port, () => {
+  console.log(`App running on port ${port}.`);
+});
+
 module.exports = {
-  getOrders,
-  getOrderById,
-  createOrder,
-  updateOrder,
+  pool,
 };

@@ -7,7 +7,7 @@ RUN npm cache clean --force
 RUN npm install
 COPY . .
 
-EXPOSE 3100
+EXPOSE 3300
 
 # CMD npm start
 CMD [ "node", "index.js" ]
