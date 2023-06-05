@@ -2,5 +2,5 @@
 CREATE TABLE orders (
   ID SERIAL PRIMARY KEY,
   userId integer,
-  productIds integer[]
+  productIds VARCHAR[]
 );

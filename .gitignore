@@ -4,6 +4,8 @@
 
 
 **/.env
+orderdb
+userdb
 
 # Logs
 logs

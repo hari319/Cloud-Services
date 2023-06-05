@@ -19,11 +19,8 @@ const getOrders = (request, response) => {
     'SELECT * FROM orders ORDER BY id ASC',
     (error, results) => {
       if (error) {
-        console.log('zz');
         throw error;
       }
-
-      console.log(results.rows);
 
       response.status(200).json(results.rows);
     }
@@ -65,15 +62,40 @@ const getOrderById = async (request, response) => {
 const createOrder = async (request, response) => {
   const { userId, productIds } = request.body;
 
-  const found = (await findOrders()).find(
-    (el) => el.userid === userId
-  );
-
-  if (userId === undefined || productIds === undefined) {
+  if (userId === undefined || productIds.length <= 0) {
     response
       .status(404)
       .send(`Bad request, please check your body parameter`);
-  } else {
+    return;
+  }
+
+  const getUserById = await fetch(
+    `http://user_service:3100/user/${userId}`
+  ).then((res) => {
+    return res.json();
+  });
+
+  if (Array.isArray(getUserById) && getUserById.length <= 0) {
+    response.status(404).send(getUserId);
+    return;
+  }
+
+  const getProductById = await fetch(
+    `http://product_service:3200/products`
+  ).then((res) => {
+    return res.json();
+  });
+
+  if (Array.isArray(getProductById) && getProductById.length <= 0) {
+    response.status(404).send(getUserId);
+    return;
+  }
+
+  const intersection = getProductById
+    .map((el) => el._id)
+    .filter((element) => productIds.includes(element));
+
+  if (intersection.length === productIds.length) {
     pool.query(
       'INSERT INTO orders (userId, productIds) VALUES ($1, $2)',
       [userId, productIds],
@@ -87,6 +109,9 @@ const createOrder = async (request, response) => {
           .send(`Order added with ID: ${results.insertId}`);
       }
     );
+    return;
+  } else {
+    response.status(404).send(`Product id not found`);
   }
 };
 
@@ -121,6 +146,29 @@ const updateOrder = async (request, response) => {
   }
 };
 
+const deleteOrder = async (request, response) => {
+  const id = parseInt(request.params.id);
+
+  const found = (await findOrders()).find((el) => el.id === id);
+
+  if (!found) {
+    response
+      .status(404)
+      .send(`Order with ID: ${id} cant not be found`);
+  } else {
+    pool.query(
+      'DELETE FROM orders WHERE id = $1',
+      [id],
+      (error, results) => {
+        if (error) {
+          throw error;
+        }
+        response.status(200).send(`Order deleted with ID: ${id}`);
+      }
+    );
+  }
+};
+
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
@@ -137,6 +185,7 @@ app.get('/orders', getOrders);
 app.get('/order/:id', getOrderById);
 app.post('/order', createOrder);
 app.put('/order/:id', updateOrder);
+app.delete('/order/:id', deleteOrder);
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`);
