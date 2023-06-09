@@ -150,7 +150,7 @@ app.get('/', (request, response) => {
     info: 'Product service',
   });
 });
-app.get('/products', getProducts);
+app.get('/product/list', getProducts);
 app.get('/product/:id', getProductById);
 app.post('/product', createProduct);
 app.put('/product/:id', updateProduct);

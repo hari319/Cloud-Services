@@ -40,7 +40,13 @@ services:
     networks:
       - cloud-services
 
-
+  rabbitmq:
+      image: rabbitmq
+      ports:
+        - '5672:5672'
+        - '15672:15672'
+      networks:
+      - cloud-services
 
   user_service:
     restart: on-failure
@@ -81,8 +87,6 @@ services:
     networks:
       - cloud-services
 
-
-
   order_service:
     restart: on-failure
     build: 
@@ -100,10 +104,26 @@ services:
       - 3300:3300
     depends_on:
       - order_db_host
+      - rabbitmq
     command: npm run start
     networks:
       - cloud-services
 
+  nginx:
+    restart: on-failure
+    image: nginx
+    ports:
+      - 8080:8080
+      - 8081:8081
+      - 8082:8082
+    depends_on:
+      - user_service
+      - product_service
+      - order_service
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - cloud-services
 
 volumes:
   userdb:

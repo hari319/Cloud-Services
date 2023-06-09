@@ -146,7 +146,7 @@ app.get('/', (request, response) => {
     info: 'User service',
   });
 });
-app.get('/users', getUsers);
+app.get('/user/list', getUsers);
 app.get('/user/:id', getUserById);
 app.post('/user', createUser);
 app.put('/user/:id', updateUser);

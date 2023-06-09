@@ -181,7 +181,7 @@ app.get('/', (request, response) => {
     info: 'Node.js, Express, and Postgres API',
   });
 });
-app.get('/orders', getOrders);
+app.get('/order/list', getOrders);
 app.get('/order/:id', getOrderById);
 app.post('/order', createOrder);
 app.put('/order/:id', updateOrder);
