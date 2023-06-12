@@ -10,6 +10,11 @@ services:
       POSTGRES_USER: postgres_user
       POSTGRES_PASSWORD: postgres_pass
       POSTGRES_DB: user_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     volumes: 
       - ./userdb:/var/lib/postgresql/data
       - ./db/userInit.sql:/docker-entrypoint-initdb.d/userInit.sql
@@ -34,6 +39,11 @@ services:
       POSTGRES_USER: postgres_user
       POSTGRES_PASSWORD: postgres_pass
       POSTGRES_DB: order_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     volumes: 
       - ./orderdb:/var/lib/postgresql/data
       - ./db/orderInit.sql:/docker-entrypoint-initdb.d/orderInit.sql
@@ -60,7 +70,7 @@ services:
       POSTGRES_DB: user_db
       POSTGRES_PORT: 5432
       POSTGRES_HOST: user_db_host
-      POSTGRES_URI: postgresql://postgres_user:postgres_pass@user_db_host:5432/user_db
+      POSTGRES_URI: postgresql://postgres_user:postgres_pass@user_db_host:5432/user_db?sslmode=disable
     ports:
       - 3100:3100
     depends_on:
@@ -99,7 +109,7 @@ services:
       POSTGRES_DB: order_db
       POSTGRES_PORT: 5432
       POSTGRES_HOST: order_db_host
-      POSTGRES_URI: postgresql://postgres_user:postgres_pass@order_db_host:5432/order_db
+      POSTGRES_URI: postgresql://postgres_user:postgres_pass@order_db_host:5432/order_db?sslmode=disable
     ports:
       - 3300:3300
     depends_on:

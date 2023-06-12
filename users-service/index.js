@@ -71,14 +71,16 @@ const createUser = async (request, response) => {
     response.status(400).send(`User already exist`);
   } else {
     pool.query(
-      'INSERT INTO users (name, email) VALUES ($1, $2)',
+      'INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id',
       [name, email],
       (error, results) => {
         if (error) {
           throw error;
         }
-        console.log(results);
-        response.status(201).send(`User added successfully`);
+
+        response
+          .status(201)
+          .send(`user added with ID: ${results.rows[0].id}`);
       }
     );
   }

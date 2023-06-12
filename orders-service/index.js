@@ -14,7 +14,6 @@ const pool = new Pool({
 });
 
 const getOrders = (request, response) => {
-  console.log('12');
   pool.query(
     'SELECT * FROM orders ORDER BY id ASC',
     (error, results) => {
@@ -36,9 +35,7 @@ const findOrders = async () => {
 const getOrderById = async (request, response) => {
   const id = parseInt(request.params.id);
 
-  const found = (await findOrders()).find(
-    (el) => el.userid === userId
-  );
+  const found = (await findOrders()).find((el) => el.id === id);
 
   if (!found) {
     response
@@ -81,13 +78,13 @@ const createOrder = async (request, response) => {
   }
 
   const getProductById = await fetch(
-    `http://product_service:3200/products`
+    `http://product_service:3200/product/list`
   ).then((res) => {
     return res.json();
   });
 
   if (Array.isArray(getProductById) && getProductById.length <= 0) {
-    response.status(404).send(getUserId);
+    response.status(404).send(getProductById);
     return;
   }
 
@@ -97,7 +94,7 @@ const createOrder = async (request, response) => {
 
   if (intersection.length === productIds.length) {
     pool.query(
-      'INSERT INTO orders (userId, productIds) VALUES ($1, $2)',
+      'INSERT INTO orders (userId, productIds) VALUES ($1, $2) RETURNING id',
       [userId, productIds],
       (error, results) => {
         if (error) {
@@ -106,12 +103,16 @@ const createOrder = async (request, response) => {
 
         response
           .status(201)
-          .send(`Order added with ID: ${results.insertId}`);
+          .send(`Order added with ID: ${results.rows[0].id}`);
       }
     );
     return;
   } else {
-    response.status(404).send(`Product id not found`);
+    response
+      .status(404)
+      .send(
+        `Product with similar id cannot be found. Please check your productIds`
+      );
   }
 };
 
@@ -123,7 +124,7 @@ const updateOrder = async (request, response) => {
     (el) => el.userid === userId
   );
 
-  if (userId === undefined || productIds === undefined) {
+  if (userId === undefined || productIds.length > 0) {
     response
       .status(400)
       .send(`Bad request, please check your body parameter`);
