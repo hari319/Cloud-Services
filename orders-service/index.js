@@ -1,4 +1,5 @@
 const express = require('express');
+const amqplib = require('amqplib');
 const bodyParser = require('body-parser');
 const Pool = require('pg').Pool;
 
@@ -96,10 +97,17 @@ const createOrder = async (request, response) => {
     pool.query(
       'INSERT INTO orders (userId, productIds) VALUES ($1, $2) RETURNING id',
       [userId, productIds],
-      (error, results) => {
+      async (error, results) => {
         if (error) {
           throw error;
         }
+
+        // RabbitMq connection & publish message
+        await publish({
+          id: results.rows[0].id,
+          userId,
+          productIds,
+        });
 
         response
           .status(201)
@@ -113,6 +121,37 @@ const createOrder = async (request, response) => {
       .send(
         `Product with similar id cannot be found. Please check your productIds`
       );
+  }
+};
+
+const publish = async (msg) => {
+  // RabbitMQ connection parameters
+  const amqpUrl =
+    process.env.AMQP_URL || 'amqp://guest:guest@rabbitmq:5672';
+  const exchange = 'order-exchange';
+  const queue = 'order';
+  const routingKey = 'shipping-routing-key';
+
+  const connection = await amqplib.connect(amqpUrl, 'heartbeat=60');
+  const channel = await connection.createChannel();
+
+  try {
+    console.log('Publishing');
+
+    await channel.assertExchange(exchange, 'direct', {
+      durable: true,
+    });
+    await channel.assertQueue(queue, { durable: true });
+    await channel.bindQueue(queue, exchange, routingKey);
+    await channel.publish(
+      exchange,
+      routingKey,
+      Buffer.from(JSON.stringify(msg))
+    );
+
+    console.log('Message published');
+  } catch (e) {
+    console.error('Error in publishing message', e);
   }
 };
 
