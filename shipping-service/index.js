@@ -1,13 +1,11 @@
 const amqplib = require('amqplib');
 const amqpUrl = process.env.AMQP_URL || 'amqp://rabbitmq:5672';
 
-async function processMessage(msg) {
+const processMessage = async (msg) => {
   console.log(msg.content.toString(), 'Order received');
-  //call your email service here to send the email
-}
+};
 
 (async () => {
-  console.log(amqpUrl, process.env.AMQP_UR);
   const connection = await amqplib.connect(amqpUrl, 'heartbeat=60');
   const channel = await connection.createChannel();
   const queue = 'order';
