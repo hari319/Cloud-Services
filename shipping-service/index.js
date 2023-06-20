@@ -1,12 +1,10 @@
 const amqplib = require('amqplib');
-const amqpUrl = process.env.AMQP_URL || 'amqp://rabbitmq:5672';
-
-const processMessage = async (msg) => {
-  console.log(msg.content.toString(), 'Order received');
-};
 
 (async () => {
-  const connection = await amqplib.connect(amqpUrl, 'heartbeat=60');
+  const connection = await amqplib.connect(
+    process.env.AMQP_URL,
+    'heartbeat=60'
+  );
   const channel = await connection.createChannel();
   const queue = 'order';
 
@@ -24,7 +22,7 @@ const processMessage = async (msg) => {
     queue,
     async (msg) => {
       console.log('processing messages');
-      await processMessage(msg);
+      console.log(msg.content.toString(), 'Order received');
       await channel.ack(msg);
     },
     {

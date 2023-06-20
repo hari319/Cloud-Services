@@ -126,13 +126,14 @@ const createOrder = async (request, response) => {
 
 const publish = async (msg) => {
   // RabbitMQ connection parameters
-  const amqpUrl =
-    process.env.AMQP_URL || 'amqp://guest:guest@rabbitmq:5672';
   const exchange = 'order-exchange';
   const queue = 'order';
   const routingKey = 'shipping-routing-key';
 
-  const connection = await amqplib.connect(amqpUrl, 'heartbeat=60');
+  const connection = await amqplib.connect(
+    process.env.AMQP_URL,
+    'heartbeat=60'
+  );
   const channel = await connection.createChannel();
 
   try {
