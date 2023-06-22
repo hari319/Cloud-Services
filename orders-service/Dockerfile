@@ -1,5 +1,7 @@
 FROM node:18-alpine as base
 
+ENV ORDER_SERVICE_PORT=3300
+
 WORKDIR /app
 
 COPY ./package.json .

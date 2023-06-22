@@ -67,7 +67,6 @@ services:
       context: ./users-service
       dockerfile: Dockerfile
     environment:
-      USER_SERVICE_PORT: 3100
       POSTGRES_USER: postgres_user
       POSTGRES_PASSWORD: postgres_pass
       POSTGRES_DB: user_db
@@ -91,7 +90,6 @@ services:
     ports:
       - 3200:3200
     environment:
-      PRODUCT_SERVICE_PORT: 3200
       MONGO_DB: mongo_db
       MONGO_HOST: product_db_host
     depends_on:
@@ -106,7 +104,6 @@ services:
       context: ./orders-service
       dockerfile: Dockerfile
     environment:
-      ORDER_SERVICE_PORT: 3300
       POSTGRES_USER: postgres_user
       POSTGRES_PASSWORD: postgres_pass
       POSTGRES_DB: order_db
