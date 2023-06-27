@@ -4,14 +4,14 @@ const { MongoClient, ObjectId } = require('mongodb');
 
 const app = express();
 const port = process.env.PRODUCT_SERVICE_PORT;
-const mongoDbName = process.env.MONGO_DB;
-const mongoURL = `mongodb://${process.env.MONGO_HOST}:27017/${mongoDbName}`;
-const client = new MongoClient(mongoURL);
+const client = new MongoClient(process.env.MONGO_URL);
 
 const getProducts = async (request, response) => {
   try {
     await client.connect();
-    const collection = client.db(mongoDbName).collection('products');
+    const collection = client
+      .db(process.env.MONGO_DB)
+      .collection('products');
     let results = await collection.find().toArray();
 
     response.send(results).status(200);
@@ -22,7 +22,9 @@ const getProducts = async (request, response) => {
 
 const findProducts = async () => {
   await client.connect();
-  const collection = client.db(mongoDbName).collection('products');
+  const collection = client
+    .db(process.env.MONGO_DB)
+    .collection('products');
   return await collection.find().toArray();
 };
 
@@ -57,7 +59,7 @@ const createProduct = async (request, response) => {
     try {
       await client.connect();
       const collection = client
-        .db(mongoDbName)
+        .db(process.env.MONGO_DB)
         .collection('products');
       let results = await collection.insertOne({ name, description });
 
@@ -87,7 +89,7 @@ const updateProduct = async (request, response) => {
     try {
       await client.connect();
       const collection = client
-        .db(mongoDbName)
+        .db(process.env.MONGO_DB)
         .collection('products');
 
       await collection.updateOne(
@@ -124,7 +126,7 @@ const deleteProduct = async (request, response) => {
     try {
       await client.connect();
       const collection = client
-        .db(mongoDbName)
+        .db(process.env.MONGO_DB)
         .collection('products');
 
       await collection.deleteOne({
