@@ -12,7 +12,27 @@ const pool = new Pool({
   host: process.env.POSTGRES_HOST,
   database: process.env.POSTGRES_DB,
   port: process.env.POSTGRES_PORT,
+  ssl: true,
 });
+
+const createTable = () => {
+  pool.query(
+    `CREATE TABLE IF NOT EXISTS  orders (
+      ID SERIAL PRIMARY KEY,
+      userId integer,
+      productIds VARCHAR[]
+    )`,
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+
+      console.log('Table Created');
+    }
+  );
+};
+
+createTable();
 
 const getOrders = (request, response) => {
   pool.query(

@@ -19,7 +19,6 @@ services:
       context: ./orders-service
       dockerfile: Dockerfile
     environment:
-      ORDER_SERVICE_PORT: 3300
       POSTGRES_USER: postgres_user
       POSTGRES_PASSWORD: postgres_pass
       POSTGRES_DB: order_db
